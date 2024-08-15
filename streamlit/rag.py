@@ -57,7 +57,20 @@ class ChatPDF:
 
     def ask(self, query: str):
         if not self.chain:
-            return "Please, add a PDF document first."
+            # return "Please, add a PDF document first."
+            vector_store =  Chroma.PersistentClient(path="./db/chromadb")
+            self.retriever = vector_store.as_retriever(
+            search_type="similarity_score_threshold",
+                search_kwargs={
+                    "k": 3,
+                    "score_threshold": 0.5,
+                },
+            )
+
+            self.chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+                        | self.prompt
+                        | self.model
+                        | StrOutputParser())
 
         return self.chain.invoke(query)
 
