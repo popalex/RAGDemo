@@ -39,7 +39,9 @@ class ChatPDF:
         chunks = self.text_splitter.split_documents(docs)
         chunks = filter_complex_metadata(chunks)
 
-        vector_store = Chroma.from_documents(documents=chunks, embedding=FastEmbedEmbeddings())
+        vector_store = Chroma.from_documents(documents=chunks, 
+                                             embedding=FastEmbedEmbeddings(),
+                                             persist_directory="./db/chromadb")
         self.retriever = vector_store.as_retriever(
             search_type="similarity_score_threshold",
             search_kwargs={
